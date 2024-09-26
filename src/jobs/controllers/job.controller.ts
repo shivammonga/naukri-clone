@@ -44,7 +44,7 @@ export class JobController {
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(RoleType.CANDIDATE)
   async applyJob(@GetUser() user, @Param("jobId") jobId: string): Promise<{ message: String }> {
-    await this.jobsService.applyJob(jobId, user._id);
+    await this.jobsService.applyJob(jobId, user._id, user.email);
     return {
       message: "Job applied successfully",
     };

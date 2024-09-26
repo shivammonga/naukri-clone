@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UtilsModule } from "./utils/utils.module";
 import { JobsModule } from './jobs/jobs.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JobsModule } from './jobs/jobs.module';
     AuthModule,
     UtilsModule,
     JobsModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],

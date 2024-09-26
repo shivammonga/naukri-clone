@@ -7,6 +7,7 @@ import { PaginationDto } from "src/utils/dto/pagination.dto";
 import { JobApplications } from "../schemas/job-applications.schema";
 import { JobApplicationsDto } from "../dto/job-applications.dto";
 import { JobPipe } from "../pipes/job.pipe";
+import { MailService } from "src/mail/services/mail.service";
 
 @Injectable()
 export class JobsService {
@@ -14,6 +15,7 @@ export class JobsService {
     @InjectModel(Jobs.name) private JobModel: Model<Jobs>,
     @InjectModel(JobApplications.name) private JobApplicationsModel: Model<JobApplications>,
     private JobPipes: JobPipe,
+    private readonly mailService: MailService,
   ) {}
 
   async createJob(createJobDto: JobDto, userId: string): Promise<Jobs> {
@@ -43,7 +45,7 @@ export class JobsService {
     };
   }
 
-  async applyJob(jobId: string, userId: string): Promise<JobApplications> {
+  async applyJob(jobId: string, userId: string, email: string): Promise<JobApplications> {
     let jobExists = await this.JobModel.findOne({ _id: jobId, isActive: true }, { postedBy: 1 });
     if (!jobExists) throw new BadRequestException("Job not found");
     let appliedJobData = {
@@ -53,6 +55,12 @@ export class JobsService {
     };
     let saveJobData = new this.JobApplicationsModel(appliedJobData);
     await saveJobData.save();
+    this.mailService.sendMail({
+      to: email.toString(),
+      subject: "Job applied",
+      template: "job-applied",
+      context: {},
+    });
     return saveJobData;
   }
 
