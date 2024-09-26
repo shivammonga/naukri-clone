@@ -2,30 +2,29 @@ import { Module } from "@nestjs/common";
 import { AuthService } from "./services/auth.service";
 import { AuthController } from "./controllers/auth.controller";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Otp, OtpSchema } from "./schemas/otp.schema";
-import { UsersModule } from "src/users/users.module";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
-import { GoogleStrategy } from "./strategies/google.strategy";
 import { JwtStrategy } from "./strategies/jwt.strategy";
-import { FacebookStrategy } from "./strategies/facebook.strategy";
-import { HttpModule } from '@nestjs/axios';
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { User, UserSchema } from "./schemas/user.schema";
 
 @Module({
   imports: [
     PassportModule.register({
       defaultStrategy: "jwt",
     }),
-    JwtModule.register({
-      global: true,
-      secret: "ASDsad",
-      signOptions: { expiresIn: "7d" },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        global: true,
+        secret: configService.get<string>("JWT_SECRET"),
+        signOptions: { expiresIn: "24h" },
+      }),
+      inject: [ConfigService],
     }),
-    MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }]),
-    UsersModule,
-    HttpModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  providers: [AuthService, GoogleStrategy, FacebookStrategy, JwtStrategy],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   exports: [PassportModule, JwtStrategy],
 })
