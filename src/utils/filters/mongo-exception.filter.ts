@@ -45,6 +45,9 @@ export class MongoExceptionFilter implements ExceptionFilter {
       }
     } else {
       let exceptionName = exception["name"];
+      // console.log("---- exception is -------- ", exception);
+      // console.log("---- exception name is ------- ", exceptionName);
+      // console.log("-------- message are -------- ", exception["message"]);
       switch (exceptionName) {
         case "ValidationError":
           {

@@ -1,21 +1,12 @@
-import { MaxLength, IsEnum, ValidateIf, IsEmail, Length, IsNotEmpty } from "class-validator";
-import { AuthTypes } from "../enums/auth.enum";
+import { MaxLength, IsEmail, IsNotEmpty } from "class-validator";
 import { Transform } from "class-transformer";
 
 export class LoginDto {
-  @IsEnum([AuthTypes.EMAIL, AuthTypes.MOBILE])
-  type: string;
-
-  @ValidateIf(req => req.type === AuthTypes.EMAIL)
   @Transform(param => param.value.toLowerCase())
-  @IsEmail()
-  @MaxLength(255)
+  @IsEmail({}, { message: "Invalid email address" })
+  @MaxLength(255, { message: "email exceeds its character limit" })
   email: string;
 
-  @ValidateIf(req => req.type === AuthTypes.MOBILE)
-  @Length(10)
-  mobile: string;
-
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Invalid password" })
   password: string;
 }
